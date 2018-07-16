@@ -1,0 +1,11 @@
+#!/bin/sh
+KERNELRELEASE=4.4.94
+distro=stretch
+target=socfpga
+cross_target=armhf
+target_device=de0-nano-soc
+U_BOOT_BUILD_DIR=../socfpga_u-boot/build/u-boot-de0-nano-soc
+KERNEL_BUILD_DIR=../socfpga_kernel/build
+SOCFPGA_GHRD=../socfpga/de0_nano_soc_ghrd
+DTS=../socfpga/dts/soc_system.dts
+DTB=../socfpga/dts/soc_system.dtb
