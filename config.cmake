@@ -16,4 +16,4 @@ set( RBF "${topdir}/socfpga/dts/soc_system.rbf" )
 set( DTS "${topdir}/socfpga/dts/soc_system.dts" )
 set( DTB "${topdir}/socfpga/dts/soc_system.dtb" )
 
-message( "#####################################" )
+message( "## config.cmake ##" )

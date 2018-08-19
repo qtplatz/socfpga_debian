@@ -8,7 +8,14 @@ project (socfpga_debian)
 
 list( APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules" )
 
+set ( DEVICE_TARGET "de0-nano-soc" CACHE STRING "de0-nano-soc | sodia" )
+
 include(config.cmake)
+
+if ( ${DEVICE_TARGET} STREQUAL "sodia" )
+  include( config-sodia.cmake )
+endif()
+
 set ( TOOLS ${CMAKE_SOURCE_DIR}/scripts )
 
 #------------------------ debian rootfs ----------------
@@ -34,14 +41,20 @@ find_file( KERNELIMAGE "zImage" HINTS "${KERNEL_BUILD_DIR}/linux-${KERNELRELEASE
 
 if ( EXISTS ${RBF} )
   list ( APPEND BOOT_FILES ${RBF} )
+else()
+  message( STATUS "Warning: ${RBF} not found" )
 endif()
 
 if ( EXISTS ${DTS} )
   list ( APPEND BOOT_FILES ${DTS} )
+else()
+  message( STATUS "Warning: ${DTS} not found" )  
 endif()
 
 if ( EXISTS ${DTB} )
   list ( APPEND BOOT_FILES ${DTB} )
+else()
+  message( STATUS "Warning: ${DTB} not found" )    
 endif()
 
 if ( EXISTS "${KERNEL_BUILD_DIR}/linux-${KERNELRELEASE}/arch/arm/boot/zImage" )
@@ -71,4 +84,13 @@ message( STATUS "BOOT_FILES        " )
 foreach( i ${BOOT_FILES} )
   message( STATUS "\t\t${i}" )
 endforeach()
+message( STATUS "target_device   = " ${target_device} )
 message( STATUS "--------------------------------------------" )
+if ( DEFINED MBR )
+  message( STATUS "============ Notice ===========
+-- You must run following command after 'make img' (replacing u-boot)
+    bzcat ${MBR} | sudo dd of=/dev/loop0p3 bs=1024
+-- before 'make umount.'
+-- ======== End of Notice ========")
+endif()
+
