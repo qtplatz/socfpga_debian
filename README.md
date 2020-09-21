@@ -13,10 +13,12 @@ This project contains cmake and dependent bash scripts for de0-nano-soc debian b
  Dependent debian packages 
 ===========================
 
+```
 sudo dpkg --add-architecture armhf
 sudo apt-get -y install crossbuild-essential-armhf
 sudo apt-get -y install bc build-essential cmake dkms git libncurses5-dev
 (May be some else...)
+```
 
  Procedure
 ===========================
