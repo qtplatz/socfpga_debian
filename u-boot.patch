@@ -1,0 +1,13 @@
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index 9fb38682e6..b661b7dfc6 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -1115,7 +1115,7 @@ dtb-$(CONFIG_TARGET_IMX8MM_CL_IOT_GATE) += imx8mm-cl-iot-gate.dtb
+ targets += $(dtb-y)
+ 
+ # Add any required device tree compiler flags here
+-DTC_FLAGS +=
++DTC_FLAGS += -@
+ 
+ PHONY += dtbs
+ dtbs: $(addprefix $(obj)/, $(dtb-y))

@@ -1,16 +1,16 @@
-de0-nano-soc debian SD Card image generator
+de0-nano-soc debian10 SD Card image generator -- with device-tree overlay enabled.
 =====
 
 This project contains cmake and dependent bash scripts for de0-nano-soc debian boot SD-Card.
 
- Prerequisite
+Prerequisite
 ===============
 
 1. Linux (debian9) host (x86_64).
 2. Multiarch for armhf enabled on host.
 3. QEMU arm
 
- Dependent debian packages 
+Dependent debian packages
 ===========================
 
 ```
@@ -20,13 +20,44 @@ sudo apt-get -y install bc build-essential cmake dkms git libncurses5-dev
 (May be some else...)
 ```
 
- Procedure
+Prepare U-Boot
 ===========================
+1. Get u-boot source from source.denx.de git repo into the sibling (adjacent) directory to socfpga_debian.
 
-Under the project directory (socfpga_debian), create build directory 'mkdir build', and change directory in it.
-Run cmake as 'cmake <socfpga_debian-directory>'.  
+```bash
+SOCFPGA=~/src/de0-nano-soc
+mkdir -p $SOCFPGA
+cd $SOCFPGA
+git clone https://github.com/qtplatz/socfpga_debian
+git clone https://source.denx.de/u-boot/u-boot.git
+```
+2. Configure u-boot, apply patch and build (A patch is just add -@ option for dt-overlay ready dtb file)
 
-Makefile will be generated, then 
+```bash
+cd $SOCFPGA/u-boot/
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- distclean
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_de0_nano_soc_defconfig
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
+patch -p1 < ../socfpga_debian/u-boot.patch
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
+```
+You should have the following u-boot files by now, which are required to make an SDCard image.
+    1. `u-boot/u-boot.dtb`
+    1. `u-boot/u-boot-with-spl.sfp`
+    1. `u-boot/u-boot.img`
+
+Build Kernel
+=============================
+
+1. Create build directory, and run CMake against socfpga_debian (this) directory
+
+```bash
+mkdir $SOCFPGA/build
+cd $SOCFPGA/build
+cmake $SOCFPGA/socfpga_debian
+```
+Makefile will be created with successful CMake command.  You can find a list of make sub commands by typing `make help`.
 1. run 'make' will create Debian root file system.  This process requires root privilege due to elevated command is in script files. After 'rootfs' was created, then
 1. run 'make img' to make SD Card image file.  This step also requires root privilege for 'sudo' command.
 
+Edit `config.cmake` under a top directory of socfpga_debian for different kernel versions or u-boot locations.

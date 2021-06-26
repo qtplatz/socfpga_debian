@@ -35,35 +35,30 @@ set ( MNT_ROOTFS "/mnt/rootfs" )
 set ( IMGFILE ${CMAKE_BINARY_DIR}/${target}_${distro}-${KERNELRELEASE}-dev.img )
 #<----------------------- .img file --------------------
 
+execute_process( COMMAND make kernelversion
+  OUTPUT_VARIABLE KERNELRELEASE
+  WORKING_DIRECTORY ${KERNEL_SOURCE}
+  OUTPUT_STRIP_TRAILING_WHITESPACE )
+
 #------------- SDCard image ---------------
-find_file( U_BOOT_SPL "u-boot-with-spl.sfp" HINTS "${U_BOOT_BUILD_DIR}" )
-find_file( KERNELIMAGE "zImage" HINTS "${KERNEL_BUILD_DIR}/linux-${KERNELRELEASE}/arch/arm/boot" )
+find_file( U_BOOT_SPL "u-boot-with-spl.sfp" HINTS "${U_BOOT_DIR}" )
+find_file( KERNELIMAGE "zImage" HINTS "${KERNEL_SOURCE}/arch/arm/boot" )
+if ( KERNELIMAGE )
+  list ( APPEND BOOT_FILES ${KERNELIMAGE} )
+endif()
 
-if ( EXISTS ${RBF} )
-  list ( APPEND BOOT_FILES ${RBF} )
+if ( EXISTS "${KERNEL_SOURCE}/.config" )
+  list ( APPEND BOOT_FILES "${KERNEL_SOURCE}/.config" )
 else()
-  message( STATUS "Warning: ${RBF} not found" )
+  message( FATAL_ERROR "Either ${KERNEL_SOUCE} does not exist or not yet configured." )
 endif()
 
-if ( EXISTS ${DTS} )
-  list ( APPEND BOOT_FILES ${DTS} )
-else()
-  message( STATUS "Warning: ${DTS} not found" )  
-endif()
-
-if ( EXISTS ${DTB} )
-  list ( APPEND BOOT_FILES ${DTB} )
-else()
-  message( STATUS "Warning: ${DTB} not found" )    
-endif()
-
-if ( EXISTS "${KERNEL_BUILD_DIR}/linux-${KERNELRELEASE}/arch/arm/boot/zImage" )
-  list ( APPEND BOOT_FILES "${KERNEL_BUILD_DIR}/linux-${KERNELRELEASE}/arch/arm/boot/zImage" )
-endif()
-
-if ( EXISTS "${KERNEL_BUILD_DIR}/linux-${KERNELRELEASE}/.config" )
-  list ( APPEND BOOT_FILES "${KERNEL_BUILD_DIR}/linux-${KERNELRELEASE}/.config" )
-endif()
+#---- file existance check -----
+foreach( file ${BOOT_FILES} )
+  if ( NOT EXISTS ${file} )
+    message( FATAL_ERROR "file ${file} does not exists" )
+  endif()
+endforeach()
 
 include ( mkimage )
 add_custom_target( img DEPENDS ${IMGFILE} ${BOOT_FILES} ${PACKAGES} VERBATIM )
@@ -93,4 +88,3 @@ if ( DEFINED MBR )
 -- before 'make umount.'
 -- ======== End of Notice ========")
 endif()
-
