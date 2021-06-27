@@ -56,7 +56,7 @@ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 ```
 
-Build 
+Build img
 =============================
 
 1. Create build directory, and run CMake against socfpga_debian (this) directory
