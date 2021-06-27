@@ -55,6 +55,8 @@ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_defconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 ```
+Kernel option: CONFIGFS_FS should set 'y'
+However there is /sys/kernel/config directory, and configfs is mounted according to mount command but no device-tree directory is shown.  Not resolved issue yet.
 
 Build img
 =============================
