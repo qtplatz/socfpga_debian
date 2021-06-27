@@ -42,9 +42,9 @@ patch -p1 < ../socfpga_debian/u-boot.patch
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 ```
 You should have the following u-boot files by now, which are required to make an SDCard image.
-    1. `u-boot/u-boot.dtb`
-    1. `u-boot/u-boot-with-spl.sfp`
-    1. `u-boot/u-boot.img`
+1. u-boot/u-boot.dtb
+1. u-boot/u-boot-with-spl.sfp
+1. u-boot/u-boot.img
 
 Build Kernel
 =============================
