@@ -42,21 +42,32 @@ patch -p1 < ../socfpga_debian/u-boot.patch
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 ```
 You should have the following u-boot files by now, which are required to make an SDCard image.
-1. u-boot/u-boot.dtb
-1. u-boot/u-boot-with-spl.sfp
-1. u-boot/u-boot.img
+1. `u-boot/u-boot.dtb`
+1. `u-boot/u-boot-with-spl.sfp`
+1. `u-boot/u-boot.img`
 
 Build Kernel
 =============================
 
 ```bash
-cd linux-<version>
+git clone https://github.com/altera-opensource/linux-socfpga
+cd linux-socfpga
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_defconfig
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
+```
+As of today (2021-06-28), kernel version is 5.4.114;
+If device-overlay via /sys/kernel/config/device-tree access is not required, you can use mainline linux as well.
+
+```bash
+git clone https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+-- or --
+wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.12.13.tar.xz; tar xvf linux-5.12.13.tar.xz
+cd linux-5.12.13
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_defconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 ```
-Kernel option: CONFIGFS_FS should set 'y'
-However there is /sys/kernel/config directory, and configfs is mounted according to mount command but no device-tree directory is shown.  Not resolved issue yet.
+configfs based device-tree overlay maybe enabled via https://github.com/ikwzm/dtbocfg on mainline linux (not tested).
 
 Build img
 =============================
