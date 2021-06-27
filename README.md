@@ -49,6 +49,16 @@ You should have the following u-boot files by now, which are required to make an
 Build Kernel
 =============================
 
+```bash
+cd linux-<version>
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_defconfig
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
+```
+
+Build 
+=============================
+
 1. Create build directory, and run CMake against socfpga_debian (this) directory
 
 ```bash
