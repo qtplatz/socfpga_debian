@@ -81,6 +81,7 @@ cd $SOCFPGA/build
 cmake -DKERNELRELEASE="5.15.8" $SOCFPGA/socfpga_debian
 ```
 The success of the cmake command creates a Makefile in the build directory.  You can find a list of make sub-commands by typing `make help.`
+(The default KERNELRELEASE is defined in `$SOCFPGA/config.cmake` file)
 
 #### 2. Run 'make' (or `make rootfs`) will create Debian root file system.  
 This process requires root privilege due to elevated commands is in script files.  The 'root file system' generation process needs two steps; You need to enter two lines of commands when prompted.
@@ -92,8 +93,7 @@ After 'root file system' was created, then
 
 #### 3. Run 'make img' to make an SD Card image file.  
 This step also requires root privilege for the 'sudo' command.
-
-Edit `config.cmake` under a top directory of socfpga_debian for different kernel versions or u-boot locations.
+### Don't forget to run `make umount` for unmounting loop devices used to generate file system images.
 
 Boot `de0-nano-soc` with newly prepared SDCard
 =============================
