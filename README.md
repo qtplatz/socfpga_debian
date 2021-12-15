@@ -100,10 +100,13 @@ Boot `de0-nano-soc` with newly prepared SDCard
 
 1. Using dd command, copy generated img file to SDCard.
 ```bash
-dd if=socfpga_buster-5.10.36-dev.img of=/dev/sdX bs=1M; sync; sync; sync
+dd if=socfpga_buster-5.15.8-dev.img of=/dev/sdX bs=1M; sync; sync; sync
 ```
 1. Set SDCard to `de0-nano-soc`
 1. Connect USB cable to `de0-nano-soc`
 1. And, connect terminal using `screen /dev/ttyUSB0 115200`, and then power on.
 1. You can login as root without password
 1. Initial SDCard allocates only 2.5GB image, it can be expanded to full SDCard size by executing `/root/resizefs.sh` script, and reboot.
+
+At this moment, no FPGA configuration has applied.  At this moment, no FPGA configuration has been applied yet.  Continue to process [socfpga_modules](https://github.com/qtplatz/socfpga_modules) for it.
+
