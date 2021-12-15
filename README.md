@@ -6,7 +6,7 @@ This project contains cmake and dependent bash scripts for de0-nano-soc debian b
 Prerequisite
 ===============
 
-1. Linux (debian9) host (x86_64).
+1. Linux (debian10) host (x86_64).
 2. Multiarch for armhf enabled on host.
 3. QEMU arm
 
@@ -31,7 +31,7 @@ cd $SOCFPGA
 git clone https://github.com/qtplatz/socfpga_debian
 git clone https://source.denx.de/u-boot/u-boot.git
 ```
-2. Configure u-boot, apply patch and build (A patch is just add -@ option for dt-overlay ready dtb file)
+2. Configure u-boot, apply a patch and build (A patch adds -@ option for dt-overlay ready dtb file, so that is not necessary if you do not use dt-overlay.
 
 ```bash
 cd $SOCFPGA/u-boot/
@@ -42,6 +42,8 @@ patch -p1 < ../socfpga_debian/u-boot.patch
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 ```
 You should have the following u-boot files by now, which are required to make an SDCard image.
+The .dtb file generated here is enough to boot the soc; it will be overridden with the FPGA configuration later.
+
 1. `u-boot/u-boot.dtb`
 1. `u-boot/u-boot-with-spl.sfp`
 1. `u-boot/u-boot.img`
@@ -55,14 +57,13 @@ cd linux-socfpga
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_defconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 ```
-As of today (2021-06-28), kernel version is 5.4.114;
 If device-overlay via /sys/kernel/config/device-tree access is not required, you can use mainline linux as well.
 
 ```bash
 git clone https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 -- or --
-wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.12.13.tar.xz; tar xvf linux-5.12.13.tar.xz
-cd linux-5.12.13
+wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.15.8.tar.xz; tar xvf linux-5.15.8.tar.xz
+cd linux-5.15.8
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_defconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
@@ -77,11 +78,16 @@ Build img
 ```bash
 mkdir $SOCFPGA/build
 cd $SOCFPGA/build
-cmake $SOCFPGA/socfpga_debian
+cmake -DKERNELRELEASE="5.15.8" $SOCFPGA/socfpga_debian
 ```
-Makefile will be created with successful CMake command.  You can find a list of make sub commands by typing `make help`.
-1. run 'make' will create Debian root file system.  This process requires root privilege due to elevated command is in script files. After 'rootfs' was created, then
-1. run 'make img' to make SD Card image file.  This step also requires root privilege for 'sudo' command.
+The success of the cmake command creates a Makefile in the build directory.  You can find a list of make sub-commands by typing `make help.`
+1. run 'make' will create Debian root file system.  This process requires root privilege due to elevated commands is in script files.  The 'root file system' generation process needs two steps; You need to enter two lines of commands when prompted.
+```
+sudo chroot /home/toshi/src/de0-nano-soc/build/arm-linux-gnueabihf-rootfs-buster
+distro=buster /debootstrap.sh --second-stage
+```
+After 'root file system' was created, then
+1. run 'make img' to make an SD Card image file.  This step also requires root privilege for the 'sudo' command.
 
 Edit `config.cmake` under a top directory of socfpga_debian for different kernel versions or u-boot locations.
 
