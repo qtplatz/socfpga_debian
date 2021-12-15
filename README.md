@@ -93,7 +93,7 @@ After 'root file system' was created, then
 
 #### 3. Run 'make img' to make an SD Card image file.  
 This step also requires root privilege for the 'sudo' command.
-### Don't forget to run `make umount` for unmounting loop devices used to generate file system images.
+#### Don't forget to run `make umount` for unmounting loop devices used to generate file system images.
 
 Boot `de0-nano-soc` with newly prepared SDCard
 =============================
