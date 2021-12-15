@@ -70,6 +70,11 @@ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 ```
 configfs based device-tree overlay maybe enabled via https://github.com/ikwzm/dtbocfg on mainline linux (not tested).
 
+#### Don't forget -- build kernel headers debpkg
+```bash
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4 deb-pkg
+```
+
 Build img
 =============================
 
