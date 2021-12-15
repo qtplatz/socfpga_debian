@@ -73,7 +73,7 @@ configfs based device-tree overlay maybe enabled via https://github.com/ikwzm/dt
 Build img
 =============================
 
-1. Create build directory, and run CMake against socfpga_debian (this) directory
+#### 1. Create build directory, and run CMake against socfpga_debian (this) directory
 
 ```bash
 mkdir $SOCFPGA/build
@@ -81,13 +81,17 @@ cd $SOCFPGA/build
 cmake -DKERNELRELEASE="5.15.8" $SOCFPGA/socfpga_debian
 ```
 The success of the cmake command creates a Makefile in the build directory.  You can find a list of make sub-commands by typing `make help.`
-1. run 'make' will create Debian root file system.  This process requires root privilege due to elevated commands is in script files.  The 'root file system' generation process needs two steps; You need to enter two lines of commands when prompted.
-```
-sudo chroot /home/toshi/src/de0-nano-soc/build/arm-linux-gnueabihf-rootfs-buster
-distro=buster /debootstrap.sh --second-stage
+
+#### 2. Run 'make' (or `make rootfs`) will create Debian root file system.  
+This process requires root privilege due to elevated commands is in script files.  The 'root file system' generation process needs two steps; You need to enter two lines of commands when prompted.
+```bash
+$ sudo chroot /home/toshi/src/de0-nano-soc/build/arm-linux-gnueabihf-rootfs-buster
+$ distro=buster /debootstrap.sh --second-stage
 ```
 After 'root file system' was created, then
-1. run 'make img' to make an SD Card image file.  This step also requires root privilege for the 'sudo' command.
+
+#### 3. Run 'make img' to make an SD Card image file.  
+This step also requires root privilege for the 'sudo' command.
 
 Edit `config.cmake` under a top directory of socfpga_debian for different kernel versions or u-boot locations.
 
