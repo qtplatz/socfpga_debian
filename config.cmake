@@ -1,6 +1,6 @@
 
-set( KERNELRELEASE CACHE STRING "5.10.36" )
-set( distro "buster" )
+set( KERNELRELEASE "5.15.8" CACHE STRING "Linux kernel release such as 5.10.36" )
+set( distro "buster" CACHE STRING "Debian codename [buster|bullseye]" )
 set( target "socfpga" )
 set( cross_target "armhf" )
 set( target_device "de0-nano-soc" )
