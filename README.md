@@ -1,4 +1,4 @@
-de0-nano-soc debian10 SD Card image generator -- with device-tree overlay enabled.
+de0-nano-soc debian10 SD Card image generator.
 =====
 
 This project contains cmake and dependent bash scripts for de0-nano-soc debian boot SD-Card.
@@ -6,7 +6,7 @@ This project contains cmake and dependent bash scripts for de0-nano-soc debian b
 Prerequisite
 ===============
 
-1. Linux (debian10) host (x86_64).
+1. Linux (debian 10 buster or 11 bullseye) host (amd64).
 2. Multiarch for armhf enabled on host.
 3. QEMU arm
 
