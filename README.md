@@ -1,4 +1,4 @@
-de0-nano-soc debian10 SD Card image generator.
+de0-nano-soc debian 10/11 SD card image generator.
 =====
 
 This project contains cmake and dependent bash scripts for de0-nano-soc debian boot SD-Card.
