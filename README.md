@@ -69,18 +69,17 @@ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 ```
 
-#### Don't forget -- build kernel headers debpkg
+### Quick dirty fix for `scripts/basic/fixdep: Exec format error`
+
+The Linux header module can generate by following command;
+
 ```bash
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4 deb-pkg
 ```
+However, the built .deb package contains amd64 binary that causes an error of `scripts/basic/fixdep: Exec format error` when install dkms driver module on the target device.  Indeed, fixdep is compiled with HOSTCC, which is amd64 binary.  An attempt to rebuild by "make scripts" on /usr/src/linux-XX-headers directory caused "no Kconfig found" error.  Quick dirty hack of this hell is as follows:
 
-### dirty fix for `scripts/basic/fixdep: Exec format error`
-Generated deb packages for linux-headers should be able to install on the target device; however, it contains a bug.  In an attempt to dkms driver build, we will hit the build error of `scripts/basic/fixdep: Exec format error`.  Indeed, fixdep is compiled with HOSTCC, which is amd64 binary.  An attempt to rebuild by "make scripts" on /usr/src/linux-XX-headers directory caused "no Kconfig found" error.  Quick dirty hack of this hell is as follows:
-
-1. Make a tar archive for linux-kernel build directory
-2. Copy it to target device and untar under /usr/src
-3. Make (or replace) symbolic link bellow
-
+1. Make a full copy of linux-kernel build directory to the /usr/src directory on the target device
+2. Make (or replace) symbolic link bellow
 ```bash
 nano # cd cd /lib/modules/$(uname -r)
 nano # ln -s /usr/src/linux-$(uname -r) source
