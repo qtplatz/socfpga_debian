@@ -31,7 +31,7 @@ add_custom_command(
   #COMMAND ${SUDO} rootfs=${MNT_ROOTFS} ${TOOLS}/network-interface.sh --dhcp
   COMMAND ${SUDO} ${CP} ${TOOLS}/resizefs.sh ${TOOLS}/post-install.sh ${MNT_ROOTFS}/root/
   COMMAND ${SUDO} chmod +x ${MNT_ROOTFS}/root/resizefs.sh ${MNT_ROOTFS}/root/post-install.sh
-  COMMAND ${SUDO} chroot ${MNT_ROOTFS} /bin/bash -c /root/post-install.sh && sudo rm -f /root/post-install.sh
+#  COMMAND ${SUDO} chroot ${MNT_ROOTFS} /bin/bash -c /root/post-install.sh && sudo rm -f /root/post-install.sh
   COMMAND echo "-- image mount on ${MNT_BOOTFS}, ${MNT_ROOTFS} -- You have to install applications manually, then run make umount --"
   DEPENDS ${ROOTFS} ${U_BOOT_SPL} ${BOOT_FILES} ${PACKAGES}
   USES_TERMINAL
