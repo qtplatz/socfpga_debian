@@ -58,7 +58,7 @@ deb-src http://ftp.jaist.ac.jp/debian $distro-updates main contrib non-free
 #
 EOF
 
-	if [[ "$distro"="bullseye" ]]; then
+	if [[ "$distro"=="bullseye" ]]; then
 		cat <<EOF>>/etc/apt/sources.list
 deb http://security.debian.org/debian-security $distro-security/updates main contrib non-free
 deb-src http://security.debian.org/debian-security $distro-security/updates main contrib non-free
@@ -72,11 +72,11 @@ EOF
 
     apt-get update
 
-	if [[ "$distro"="bullseye" ]]; then
+	if [[ "$distro"=="bullseye" ]]; then
 		#		apt-get -y install ifupdown iproute2
-		apt-get -y install iproute2
-	else
-		cat <<EOF >/etc/network/interfaces
+		apt-get -y install ifupdown iproute2
+	fi
+	cat <<EOF >/etc/network/interfaces
 # This file describes the network interfaces available on your system
 # and how to activate them. For more information, see interfaces(5).
 
@@ -88,20 +88,26 @@ iface lo inet loopback
 
 # The primary network interface
 allow-hotplug eth0
-iface eth0 inet dhcp
+
+# iface eth0 inet dhcp
+iface eth0 inet static
+	  address	192.168.1.132/24
+	  gateway	192.168.1.1
+
 # This is an autoconfigured IPv6 interface
 iface eth0 inet6 auto
 EOF
-	fi
 
+	apt-get -y install openssh-server ntpdate i2c-tools lsb-release vim sudo
+
+	# --- locale setup --->
     apt-get -y install locales dialog
-	#dpkg-reconfigure locales -- this works, but interactive
+
 	sed -i 's/^# *\(en_US.UTF-8 .*\)/\1/' /etc/locale.gen
 	locale-gen
 	dpkg-reconfigure --frontend noninteractive locales
 	update-locale LANG=${LANG}
-
-    # apt-get -y install openssh-server ntpdate i2c-tools lsb-release less vim
+	# <--- end locale setup ---
 
     passwd -d root
 
