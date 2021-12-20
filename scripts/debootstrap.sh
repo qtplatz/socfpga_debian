@@ -41,11 +41,20 @@ if [ -z $stage ]; then
     echo "sudo chroot $targetdir"
     echo "distro=$distro /$(basename $0) --second-stage"
     echo "***************************************************"
+	sudo /sbin/chroot ${targetdir} /bin/bash <<EOF
+distro=$distro /$(basename $0) --second-stage
+EOF
+    echo "********************************************************************"
+	echo "status=" $?
+	echo "You have a copy of debian $distro root filesystem on $targetdir"
+	echo "Run 'make img' to generate SD card image file"
 	echo ""
+	exit $?
 
 else
-	######### second stage ###########
+	echo "######### second stage -- ${targetdir} ###########"
     export LANG=en_US.UTF-8
+
     /debootstrap/debootstrap --second-stage
 
     cat <<EOF>/etc/apt/sources.list
@@ -114,7 +123,5 @@ EOF
     host=nano
     echo $host > /etc/hostname
     echo "127.0.1.1	$host" >> /etc/hosts
-
-	rm -f $0
 
 fi
