@@ -108,6 +108,7 @@ iface eth0 inet6 auto
 EOF
 
 	apt-get -y install openssh-server ntpdate i2c-tools lsb-release vim sudo
+	apt-get -y install build-essential
 
 	# --- locale setup --->
     apt-get -y install locales dialog
@@ -129,7 +130,7 @@ EOF
 apt-get update
 apt-get -y upgrade
 apt-get -y install getline
-apt-get -y install build-essential libncurses5-dev bc git cmake u-boot-tools
+apt-get -y install libncurses5-dev bc git cmake u-boot-tools flex bison
 EOF
 
 fi
