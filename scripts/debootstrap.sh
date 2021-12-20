@@ -53,7 +53,7 @@ EOF
 
 else
 	echo "######### second stage -- ${distro} ###########"
-    export LANG=en_US.UTF-8
+    export LANG=C
 
     /debootstrap/debootstrap --second-stage
 
@@ -98,10 +98,10 @@ iface lo inet loopback
 # The primary network interface
 allow-hotplug eth0
 
-# iface eth0 inet dhcp
-iface eth0 inet static
-	  address	192.168.1.132/24
-	  gateway	192.168.1.1
+iface eth0 inet dhcp
+#iface eth0 inet static
+#	  address	192.168.1.132/24
+#	  gateway	192.168.1.1
 
 # This is an autoconfigured IPv6 interface
 iface eth0 inet6 auto
@@ -115,7 +115,7 @@ EOF
 	sed -i 's/^# *\(en_US.UTF-8 .*\)/\1/' /etc/locale.gen
 	locale-gen
 	dpkg-reconfigure --frontend noninteractive locales
-	update-locale LANG=${LANG}
+	update-locale LANG=en_US.UTF-8
 	# <--- end locale setup ---
 
     passwd -d root
@@ -130,7 +130,6 @@ apt-get update
 apt-get -y upgrade
 apt-get -y install getline
 apt-get -y install build-essential libncurses5-dev bc git cmake u-boot-tools
-apt-get -y install ntpdate i2c-tools
 EOF
 
 fi
