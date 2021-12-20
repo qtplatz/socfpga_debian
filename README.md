@@ -51,27 +51,40 @@ The .dtb file generated here is enough to boot the soc; it will be overridden wi
 Build Kernel
 =============================
 
-```bash
-git clone https://github.com/altera-opensource/linux-socfpga
-cd linux-socfpga
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_defconfig
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
-```
-If device-overlay via /sys/kernel/config/device-tree access is not required, you can use mainline linux as well.
+The most effortless procedure is to obtain a kernel source from Debian to avoid kernel-header issues discussed later.  This only works if your target and your build host use the same Debian version.  Use 'apt source linux` command to get source package.
 
 ```bash
-git clone https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
--- or --
-wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.15.8.tar.xz; tar xvf linux-5.15.8.tar.xz
-cd linux-5.15.8
+$ cd $SOCFPGA
+$ apt source linux
+```
+
+Next git-repo provided from the Altera.
+
+```bash
+git clone https://github.com/altera-opensource/linux-socfpga
+```
+
+Or kernel.org
+
+```bash
+KERNELRELEASE=5.15.10
+wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-${KERNELRELEASE}.tar.xz; tar xvf linux-${KERNELRELEASE}.tar.xz
+```
+
+Linux kernel can configure the "socfpga" target by following three lines of commands.
+
+```bash
+cd linux-${KERNELRELEASE}
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_defconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
 ```
 
+The kernel supported by Altera only be able to configure with device-tree overlay via `/sys/kernel/config/device-tree` interface.
+
 ### Quick dirty fix for `scripts/basic/fixdep: Exec format error`
 
-The Linux header module can generate by following command;
+The dynamic module configuration (DKMS) need a Linux-header module installation, which can generate by the following command;
 
 ```bash
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4 deb-pkg
@@ -86,6 +99,8 @@ nano # ln -s /usr/src/linux-$(uname -r) source
 nano # ln -s /usr/src/linux-$(uname -r) build
 ```
 
+You can install the header module via apt-get if you pick the kernel release from one of the official Debian distributions.
+
 Build img
 =============================
 
@@ -94,12 +109,13 @@ Build img
 ```bash
 mkdir $SOCFPGA/build
 cd $SOCFPGA/build
-cmake -DKERNELRELEASE="5.15.8" $SOCFPGA/socfpga_debian
+cmake -DKERNELRELEASE=${KERNELRELEASE} -Ddistro=bullseye $SOCFPGA/socfpga_debian
 ```
+
 The success of the cmake command creates a Makefile in the build directory.  You can find a list of make sub-commands by typing `make help.`
 (The default KERNELRELEASE is defined in `$SOCFPGA/config.cmake` file)
 
-#### 2. Run 'make' (or `make rootfs`) will create Debian root file system.  
+#### 2. Run 'make' (or `make rootfs`) will create Debian root file system.
 This process requires root privilege due to elevated commands is in script files.  The 'root file system' generation process needs two steps; You need to enter two lines of commands when prompted.
 ```bash
 $ sudo chroot /home/toshi/src/de0-nano-soc/build/arm-linux-gnueabihf-rootfs-buster
@@ -107,7 +123,7 @@ $ distro=buster /debootstrap.sh --second-stage
 ```
 After 'root file system' was created, then
 
-#### 3. Run 'make img' to make an SD Card image file.  
+#### 3. Run 'make img' to make an SD Card image file.
 This step also requires root privilege for the 'sudo' command.
 #### Don't forget to run `make umount` for unmounting loop devices used to generate file system images.
 
@@ -125,4 +141,3 @@ dd if=socfpga_buster-5.15.8-dev.img of=/dev/sdX bs=1M; sync; sync; sync
 1. Initial SDCard allocates only 2.5GB image, it can be expanded to full SDCard size by executing `/root/resizefs.sh` script, and reboot.
 
 At this moment, no FPGA configuration has applied.  At this moment, no FPGA configuration has been applied yet.  Continue to process [socfpga_modules](https://github.com/qtplatz/socfpga_modules) for it.
-

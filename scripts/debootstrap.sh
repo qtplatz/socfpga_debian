@@ -108,7 +108,7 @@ iface eth0 inet6 auto
 EOF
 
 	apt-get -y install openssh-server ntpdate i2c-tools lsb-release vim sudo
-	apt-get -y install build-essential
+	apt-get -y install build-essential dkms
 
 	# --- locale setup --->
     apt-get -y install locales dialog
