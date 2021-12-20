@@ -52,7 +52,7 @@ EOF
 	exit $?
 
 else
-	echo "######### second stage -- ${targetdir} ###########"
+	echo "######### second stage -- ${distro} ###########"
     export LANG=en_US.UTF-8
 
     /debootstrap/debootstrap --second-stage
@@ -82,9 +82,9 @@ EOF
     apt-get update
 
 	if [[ "$distro"=="bullseye" ]]; then
-		#		apt-get -y install ifupdown iproute2
-		apt-get -y install ifupdown iproute2
+		apt-get -y install ifupdown iproute2 fdisk iputils-ping
 	fi
+
 	cat <<EOF >/etc/network/interfaces
 # This file describes the network interfaces available on your system
 # and how to activate them. For more information, see interfaces(5).
@@ -123,5 +123,14 @@ EOF
     host=nano
     echo $host > /etc/hostname
     echo "127.0.1.1	$host" >> /etc/hosts
+
+	cat <<EOF>/root/post-install.sh
+#!/bin/bash
+apt-get update
+apt-get -y upgrade
+apt-get -y install getline
+apt-get -y install build-essential libncurses5-dev bc git cmake u-boot-tools
+apt-get -y install ntpdate i2c-tools
+EOF
 
 fi

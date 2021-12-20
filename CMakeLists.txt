@@ -32,7 +32,7 @@ add_custom_target( rootfs ALL DEPENDS ${ROOTFS} ${CMAKE_SOURCE_DIR}/CMakeLists.t
 #----------------------- .img file --------------------
 set ( MNT_BOOTFS "/mnt/bootfs" )
 set ( MNT_ROOTFS "/mnt/rootfs" )
-set ( IMGFILE ${CMAKE_BINARY_DIR}/${target}_${distro}-${KERNELRELEASE}-dev.img )
+set ( IMGFILE ${CMAKE_BINARY_DIR}/${target}_${distro}-${KERNELRELEASE}.img )
 #<----------------------- .img file --------------------
 
 execute_process( COMMAND make kernelversion
