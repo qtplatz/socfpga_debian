@@ -16,8 +16,8 @@ Dependent debian packages
 ```
 sudo dpkg --add-architecture armhf
 sudo apt-get -y install crossbuild-essential-armhf
-sudo apt-get -y install bc build-essential cmake dkms git libncurses5-dev
-(May be some else...)
+sudo apt-get -y install build-essential bc libncurses5-dev cmake dkms git
+sudo apt-get -y install flex bison u-boot-tools
 ```
 
 Prepare U-Boot
