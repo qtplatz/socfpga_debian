@@ -1,5 +1,5 @@
 
-set( KERNELRELEASE "5.15.8" CACHE STRING "Linux kernel release such as 5.10.36" )
+set( KERNELRELEASE "5.10.84" CACHE STRING "Linux kernel release such as 5.10.36" )
 set( distro "bullseye" CACHE STRING "Debian codename [jessie|buster|bullseye]" )
 set( target "socfpga" )
 set( cross_target "armhf" )

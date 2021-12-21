@@ -67,7 +67,7 @@ git clone https://github.com/altera-opensource/linux-socfpga
 Or kernel.org
 
 ```bash
-KERNELRELEASE=5.15.10
+KERNELRELEASE=5.10.84
 wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-${KERNELRELEASE}.tar.xz; tar xvf linux-${KERNELRELEASE}.tar.xz
 ```
 
@@ -121,19 +121,21 @@ This process requires root privilege due to elevated commands is in script files
 $ sudo chroot /home/toshi/src/de0-nano-soc/build/arm-linux-gnueabihf-rootfs-buster
 $ distro=buster /debootstrap.sh --second-stage
 ```
-After 'root file system' was created, then
+After `root file system` was created, then
 
 #### 3. Run 'make img' to make an SD Card image file.
-This step also requires root privilege for the 'sudo' command.
-#### Don't forget to run `make umount` for unmounting loop devices used to generate file system images.
 
-Boot `de0-nano-soc` with newly prepared SDCard
+This step also requires root privilege for the 'sudo' command.
+
+Boot `de0-nano-soc` with newly prepared mmicro SD Card
 =============================
 
-1. Using dd command, copy generated img file to SDCard.
+1. Using dd command, copy generated img file to micro SD Card.
+
 ```bash
-dd if=socfpga_buster-5.15.8-dev.img of=/dev/sdX bs=1M; sync; sync; sync
+dd if=socfpga_buster-${KERNELRELEASE}.img of=/dev/sdX bs=1M; sync; sync; sync
 ```
+
 1. Set SDCard to `de0-nano-soc`
 1. Connect USB cable to `de0-nano-soc`
 1. And, connect terminal using `screen /dev/ttyUSB0 115200`, and then power on.
