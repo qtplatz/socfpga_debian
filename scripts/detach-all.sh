@@ -1,10 +1,10 @@
 #!/bin/bash
-# Copyright 2017-2018 (C) MS-Cheminformatics LLC
+# Copyright 2017-2022 (C) MS-Cheminformatics LLC
 # Project supported by Osaka University Graduate School of Science
 # Author: Toshinobu Hondo, Ph.D.
 
 count=`sudo losetup | grep "/dev/loop[0-9]" |wc -l`
-echo $count " device(s) found"
+echo "$(basename $0) detach loop devices: " $count " device(s) found"
 
 while ((count)); do
     count=$((count-1))
