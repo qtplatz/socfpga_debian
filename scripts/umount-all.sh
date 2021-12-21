@@ -2,6 +2,7 @@
 # Copyright 2017-2022 (C) MS-Cheminformatics LLC
 # Project supported by Osaka University Graduate School of Science
 # Author: Toshinobu Hondo, Ph.D.
+
 cwd="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 detach=0

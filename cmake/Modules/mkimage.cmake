@@ -32,7 +32,11 @@ add_custom_command(
   )
 
 add_custom_target( umount
-  COMMAND ${SUDO} ${TOOLS}/umount-all.sh ${MNT_BOOTFS} ${MNT_ROOTFS}
-  COMMAND ${SUDO} ${TOOLS}/detach-all.sh
+  COMMAND ${SUDO} ${TOOLS}/umount-all.sh --detach ${MNT_BOOTFS} ${MNT_ROOTFS}
   COMMENT "-- umounting ${MNT_BOOTFS} ${MNT_ROOTFS} --"
+  )
+
+add_custom_target( mount
+  COMMAND bootfs=${MNT_BOOTFS} rootfs=${MNT_ROOTFS} ${TOOLS}/mount.sh ${IMGFILE}
+  COMMENT "-- ounting ${MNT_BOOTFS} ${MNT_ROOTFS} --"
   )
