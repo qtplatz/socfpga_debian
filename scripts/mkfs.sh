@@ -35,8 +35,8 @@ ${cwd}/detach-all.sh
 mkimage() {
 	# 2.0GB
 	#	dd if=/dev/zero of=$1 bs=1M count=2048
-	# 2.5GB
-	dd if=/dev/zero of=$1 bs=1M count=2560
+	# 4GiB
+	dd if=/dev/zero of=$1 bs=1M count=4096
 }
 
 # new primary partition=3, start=2048, size=+1M
