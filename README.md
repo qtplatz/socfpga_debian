@@ -39,7 +39,7 @@ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- distclean
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_de0_nano_soc_defconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
 patch -p1 < ../socfpga_debian/u-boot.patch
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j`nproc`
 ```
 You should have the following u-boot files by now, which are required to make an SDCard image.
 The .dtb file generated here is enough to boot the soc; it will be overridden with the FPGA configuration later.
@@ -78,7 +78,7 @@ Linux kernel can configure the "socfpga" target by following three lines of comm
 cd linux-${KERNELRELEASE}
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_defconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j`nproc`
 ```
 
 The kernel supported by Altera only be able to configure with device-tree overlay via `/sys/kernel/config/device-tree` interface.
@@ -87,7 +87,7 @@ The kernel supported by Altera only be able to configure with device-tree overla
 
 > The dynamic module configuration (DKMS) need a Linux-header module installation, which can generate by the following command;
 ```bash
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4 deb-pkg
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j`nproc` deb-pkg
 ```
 > However, the built .deb package contains amd64 binary that causes an error of `scripts/basic/fixdep: Exec format error` when install dkms driver module on the target device.  Indeed, fixdep is compiled with HOSTCC, which is amd64 binary.  An attempt to rebuild by "make scripts" on /usr/src/linux-XX-headers directory caused "no Kconfig found" error.  
 
