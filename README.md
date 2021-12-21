@@ -57,13 +57,13 @@ Option 1. Obtain from Debian source package
 ```bash
 $ cd $SOCFPGA
 $ apt source linux
-$ KERNELRELEASE=5.10.84 # <-- this number should be modified, whil will refer later
+$ KERNELRELEASE=`make -C linux-5.10.84 kernelversion` # <-- a value "5.10.84" need to be replaced with actual value.
 ```
 
 Option 2. Obtain from the Altera provided git-repo, which support device-tree overlay.
 ```bash
 $ git clone https://github.com/altera-opensource/linux-socfpga
-$ KERNELRELEASE= X.XX.XX # <-- X.XX.XX should set for later reference
+$ KERNELRELEASE=`make -C linux-socfpga kernelversion`
 ```
 Option 3. Obtain from the kernel.org
 ```bash
