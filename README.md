@@ -16,8 +16,8 @@ Dependent debian packages
 ```
 sudo dpkg --add-architecture armhf
 sudo apt-get -y install crossbuild-essential-armhf
-sudo apt-get -y install bc build-essential cmake dkms git libncurses5-dev
-(May be some else...)
+sudo apt-get -y install build-essential bc libncurses5-dev cmake dkms git
+sudo apt-get -y install flex bison u-boot-tools
 ```
 
 Prepare U-Boot
@@ -39,7 +39,7 @@ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- distclean
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_de0_nano_soc_defconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
 patch -p1 < ../socfpga_debian/u-boot.patch
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j`nproc`
 ```
 You should have the following u-boot files by now, which are required to make an SDCard image.
 The .dtb file generated here is enough to boot the soc; it will be overridden with the FPGA configuration later.
@@ -53,53 +53,62 @@ Build Kernel
 
 The most effortless procedure is to obtain a kernel source from Debian to avoid kernel-header issues discussed later.  This only works if your target and your build host use the same Debian version.  Use 'apt source linux` command to get source package.
 
+Option 1. Obtain from Debian source package
 ```bash
 $ cd $SOCFPGA
 $ apt source linux
+$ KERNELRELEASE=`make -C linux-5.10.84 kernelversion` # <-- a value "5.10.84" need to be replaced with actual value.
 ```
 
-Next git-repo provided from the Altera.
-
+Option 2. Obtain from the Altera provided git-repo, which support device-tree overlay.
 ```bash
-git clone https://github.com/altera-opensource/linux-socfpga
+$ git clone https://github.com/altera-opensource/linux-socfpga
+$ KERNELRELEASE=`make -C linux-socfpga kernelversion`
 ```
-
-Or kernel.org
-
+Option 3. Obtain from the kernel.org
 ```bash
 KERNELRELEASE=5.15.10
-wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-${KERNELRELEASE}.tar.xz; tar xvf linux-${KERNELRELEASE}.tar.xz
+$ wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-${KERNELRELEASE}.tar.xz
+$ tar xvf linux-${KERNELRELEASE}.tar.xz
 ```
 
-Linux kernel can configure the "socfpga" target by following three lines of commands.
+Linux kernel can configure the "socfpga" target by following three lines of commands.  It will generate a file `zImage`.
 
 ```bash
 cd linux-${KERNELRELEASE}
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- socfpga_defconfig
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j`nproc`
 ```
 
 The kernel supported by Altera only be able to configure with device-tree overlay via `/sys/kernel/config/device-tree` interface.
 
 ### Quick dirty fix for `scripts/basic/fixdep: Exec format error`
 
-The dynamic module configuration (DKMS) need a Linux-header module installation, which can generate by the following command;
-
+> The dynamic module configuration (DKMS) need a Linux-header module installation, which can generate by the following command;
 ```bash
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4 deb-pkg
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j`nproc` deb-pkg
 ```
-However, the built .deb package contains amd64 binary that causes an error of `scripts/basic/fixdep: Exec format error` when install dkms driver module on the target device.  Indeed, fixdep is compiled with HOSTCC, which is amd64 binary.  An attempt to rebuild by "make scripts" on /usr/src/linux-XX-headers directory caused "no Kconfig found" error.  Quick dirty hack of this hell is as follows:
+> However, the built .deb package contains amd64 binary that causes an error of `scripts/basic/fixdep: Exec format error` when install dkms driver module on the target device.  Indeed, fixdep is compiled with HOSTCC, which is amd64 binary.  An attempt to rebuild by "make scripts" on /usr/src/linux-XX-headers directory caused "no Kconfig found" error.  
+
+Quick dirty hack of this hell is as follows:
 
 1. Make a full copy of linux-kernel build directory to the /usr/src directory on the target device
+```bash
+$ cd ${SOCFPGA}/${KERNELRELEASE}; make clean
+$ cd ..
+$ tar -acvf linux-${KERNELRELEASE}.tar.xz ./linux-${KERNELRELEASE}
+```
 2. Make (or replace) symbolic link bellow
 ```bash
 nano # cd cd /lib/modules/$(uname -r)
 nano # ln -s /usr/src/linux-$(uname -r) source
 nano # ln -s /usr/src/linux-$(uname -r) build
 ```
+You can install the header module via apt-get if you pick the kernel release from one of the official Debian distributions.  You also have to make a symbolic links corresponding to above.
 
-You can install the header module via apt-get if you pick the kernel release from one of the official Debian distributions.
+> The symbolic links can be created on the `rootfs` or `img` file will create on the next section.
+> Easy way is make a copy to `rootfs`, which is usual directory tree on the Linux.
 
 Build img
 =============================
@@ -107,33 +116,33 @@ Build img
 #### 1. Create build directory, and run CMake against socfpga_debian (this) directory
 
 ```bash
-mkdir $SOCFPGA/build
-cd $SOCFPGA/build
-cmake -DKERNELRELEASE=${KERNELRELEASE} -Ddistro=bullseye $SOCFPGA/socfpga_debian
+$ distro=bullseye
+$ mkdir $SOCFPGA/build-${distro}
+$ cd $SOCFPGA/build-${distro}
+$ cmake -DKERNELRELEASE=${KERNELRELEASE} -Ddistro=${distro} $SOCFPGA/socfpga_debian
 ```
-
 The success of the cmake command creates a Makefile in the build directory.  You can find a list of make sub-commands by typing `make help.`
-(The default KERNELRELEASE is defined in `$SOCFPGA/config.cmake` file)
 
-#### 2. Run 'make' (or `make rootfs`) will create Debian root file system.
+#### 2. Run 'make' (equivalent to `make rootfs`) will create Debian root file system.
 This process requires root privilege due to elevated commands is in script files.  The 'root file system' generation process needs two steps; You need to enter two lines of commands when prompted.
 ```bash
 $ sudo chroot /home/toshi/src/de0-nano-soc/build/arm-linux-gnueabihf-rootfs-buster
 $ distro=buster /debootstrap.sh --second-stage
 ```
-After 'root file system' was created, then
+After `rootfs` was created, then
 
 #### 3. Run 'make img' to make an SD Card image file.
-This step also requires root privilege for the 'sudo' command.
-#### Don't forget to run `make umount` for unmounting loop devices used to generate file system images.
 
-Boot `de0-nano-soc` with newly prepared SDCard
+This step also requires root privilege for the 'sudo' command.
+
+Boot `de0-nano-soc` with newly prepared micro SD Card
 =============================
 
-1. Using dd command, copy generated img file to SDCard.
+1. Using dd command, copy generated img file to micro SD Card.
 ```bash
-dd if=socfpga_buster-5.15.8-dev.img of=/dev/sdX bs=1M; sync; sync; sync
+dd if=socfpga_buster-${KERNELRELEASE}.img of=/dev/sdX bs=1M; sync
 ```
+
 1. Set SDCard to `de0-nano-soc`
 1. Connect USB cable to `de0-nano-soc`
 1. And, connect terminal using `screen /dev/ttyUSB0 115200`, and then power on.
