@@ -69,7 +69,7 @@ add_custom_target( mount
   )
 
 add_custom_target( 7z
-  COMMAND mv -f "${IMGFILE}.7z" "${IMGFILE}.prev.7z"
-  COMMAND 7z a "${IMGFILE}.7z" "${IMGFILE}"
+  bash -c "[[ -f ${IMGFILE}.7z ]] && mv -f ${IMGFILE}.7z ${IMGFILE}.prev.7z; 7z a ${IMGFILE}.7z ${IMGFILE}"
   COMMENT "-- archive ${IMGFILE} --"
+  VERBATIM
   )
