@@ -43,7 +43,7 @@ if [ -z ${kernel_source} ]; then
 	exit 1
 fi
 
-KERNELRELEASE=$(make -C ${kernel_source} kernelversion)
+KERNELRELEASE=$( (cd ${kernel_source}; make kernelversion) )
 echo "--------------- $0 -------------------------"
 echo "bootfs destination = ${bootfs}"
 echo "kernel source      = ${kernel_source}"
@@ -62,13 +62,18 @@ tar Ccf "$(dirname ${kernel_source})" - "$(basename ${kernel_source})" | tar Cxf
 
 # re-link
 /sbin/chroot "${rootfs_dest}" /bin/bash <<EOF
-echo ============== chroot ================
-echo KERNELRELEAE=${KERNELRELEASE}
-echo ======================================
-ln -sf ../../../usr/src/linux-${KERNELRELEASE} /lib/modules/${KERNELRELASE}/source
-ln -sf ../../../usr/src/linux-${KERNELRELEASE} /lib/modules/${KERNELRELASE}/build
+echo ============== chroot ================ `pwd`
+echo ============== chroot ================ ${rootfs_dest}
+echo ============== chroot ================ ${KERNELRELEASE}
+set -x
+( cd /lib/modules/${KERNELRELEASE}; \
+  ln -sf /usr/src/linux-${KERNELRELEASE} source; \
+  ln -sf /usr/src/linux-${KERNELRELEASE} build )
 chmod +x /root/resizefs.sh
 chmod +x /root/post-install.sh
+make -C /usr/src/linux-${KERNELRELEASE} scripts
+make -C /usr/src/linux-${KERNELRELEASE} prepare0
+( cd /lib/modules; ln -s ${KERNELRELEASE} $(uname -r) ) # fake unmae
 EOF
 
 exit 0

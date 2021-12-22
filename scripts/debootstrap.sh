@@ -82,7 +82,7 @@ EOF
     apt-get update
 
 	if [[ "$distro"=="bullseye" ]]; then
-		apt-get -y install ifupdown iproute2 fdisk iputils-ping
+		apt-get -y install ifupdown iproute2 fdisk iputils-ping file
 	fi
 
 	cat <<EOF >/etc/network/interfaces
@@ -108,7 +108,7 @@ iface eth0 inet6 auto
 EOF
 
 	apt-get -y install openssh-server ntpdate i2c-tools lsb-release vim sudo
-	apt-get -y install build-essential dkms
+	apt-get -y install build-essential dkms bc flex bison
 
 	# --- locale setup --->
     apt-get -y install locales dialog
@@ -129,8 +129,7 @@ EOF
 #!/bin/bash
 apt-get update
 apt-get -y upgrade
-apt-get -y install getline
-apt-get -y install libncurses5-dev bc git cmake u-boot-tools flex bison
+apt-get -y install git cmake u-boot-tools
 EOF
 
 fi
